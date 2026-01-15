@@ -25,14 +25,16 @@ export const generateWordPair = async () => {
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const prompt = `Genera un objeto JSON válido para un juego de "Impostor" con estas reglas:
-        1. 'word': Una palabra en español (sustantivo) relacionada con el tema: "${randomTopic}".
-        2. 'hint': La categoría general a la que pertenece (NO digas la palabra exacta).
+        const prompt = `Genera un objeto JSON válido para un juego de "Impostor" (Word Game):
+        1. 'word': Una palabra sustantivo en español relacionada con el tema: "${randomTopic}".
+        2. 'hint': ÚNICAMENTE la categoría general o familia a la que pertenece. NO des definiciones ni descripciones.
         
-        Ejemplo si el tema fuera "Vehículos":
-        {"word": "Submarino", "hint": "Transporte acuático"}
-        
-        Sé creativo y varía la palabra cada vez.
+        EJEMPLOS DE PISTA (HINT) CORRECTOS:
+        - Si la palabra es "Gato" -> hint: "Animal"
+        - Si la palabra es "Hamburguesa" -> hint: "Comida"
+        - Si la palabra es "Juez" -> hint: "Profesión"
+        - Si la palabra es "Fútbol" -> hint: "Deporte"
+
         Responde SOLO con el JSON.`;
 
         const result = await model.generateContent(prompt);
