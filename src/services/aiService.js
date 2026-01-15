@@ -5,6 +5,13 @@ const API_KEY = "AIzaSyC6wsXnBy9L1z57nZWA33cii9gdpaxvWbg";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
+// Categorías para dar variedad y evitar que la IA repita siempre lo mismo
+const TOPICS = [
+    "Animales", "Comida", "Objetos de Casa", "Profesiones", "Lugares",
+    "Deportes", "Emociones", "Tecnología", "Naturaleza", "Ropa",
+    "Instrumentos Musicales", "Vehículos", "Cuerpo Humano", "Películas/Arte"
+];
+
 export const generateWordPair = async () => {
     // Si la key sigue siendo el placeholder o está vacía/corta
     if (!API_KEY || API_KEY === "PEGA_TU_API_KEY_AQUI" || API_KEY.length < 10) {
@@ -12,14 +19,20 @@ export const generateWordPair = async () => {
         return getRandomFallback();
     }
 
+    // Elegir tema aleatorio para forzar variedad
+    const randomTopic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
 
     try {
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const prompt = `Genera un objeto JSON válido con dos campos: 
-        1. 'word': Una palabra sustantivo común en español tambien emociones y todod tipo de palabras para un juego de adivinanzas (ej. "Manzana", "Fútbol", "Astronauta").
-        2. 'hint': Categoria de la palabra ejemplo carro: vehiculo, perro: animal, etc.
+        const prompt = `Genera un objeto JSON válido para un juego de "Impostor" con estas reglas:
+        1. 'word': Una palabra en español (sustantivo) relacionada con el tema: "${randomTopic}".
+        2. 'hint': La categoría general a la que pertenece (NO digas la palabra exacta).
         
+        Ejemplo si el tema fuera "Vehículos":
+        {"word": "Submarino", "hint": "Transporte acuático"}
+        
+        Sé creativo y varía la palabra cada vez.
         Responde SOLO con el JSON.`;
 
         const result = await model.generateContent(prompt);
@@ -41,7 +54,7 @@ export const generateWordPair = async () => {
     } catch (error) {
         console.error("Error Gemini:", error.message);
         if (error.message.includes("400") || error.message.includes("API key")) {
-            console.warn("⚠️ Tu API Key no es válida o no tiene permisos. El juego usará palabras locales por ahora.");
+            console.warn("⚠️ API Key inválida o sin permisos.");
         }
         return getRandomFallback();
     }
