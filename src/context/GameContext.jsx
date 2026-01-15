@@ -179,9 +179,17 @@ export const GameProvider = ({ children }) => {
             // Assign Impostor
             const impostorIndex = Math.floor(Math.random() * players.length);
             const impostorId = players[impostorIndex].id;
+            console.log("Starting game. Impostor:", impostorId);
 
             // Generate Word and Hint
-            const { word, hint } = await generateWordPair();
+            const wordData = await generateWordPair();
+            console.log("Word generated:", wordData);
+
+            if (!wordData || !wordData.word || !wordData.hint) {
+                throw new Error("No se pudo generar la palabra y pista.");
+            }
+
+            const { word, hint } = wordData;
 
             await updateDoc(roomRef, {
                 status: 'PLAYING',
