@@ -17,7 +17,7 @@ export const generateWordPair = async () => {
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `Genera un objeto JSON válido con dos campos: 
-        1. 'word': Una palabra sustantivo común en español tambien emociones para un juego de adivinanzas (ej. "Manzana", "Fútbol", "Astronauta").
+        1. 'word': Una palabra sustantivo común en español tambien emociones y todod tipo de palabras para un juego de adivinanzas (ej. "Manzana", "Fútbol", "Astronauta").
         2. 'hint': Categoria de la palabra ejemplo carro: vehiculo, perro: animal, etc.
         
         Responde SOLO con el JSON.`;
