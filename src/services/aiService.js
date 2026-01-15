@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fallbackPairs } from '../data/wordPairs';
 
-const API_KEY = "AIzaSyCgLa-duAUaP0Jp1jU8c3o_cgd9BsHRur0";
+const API_KEY = "AIzaSyC6wsXnBy9L1z57nZWA33cii9gdpaxvWbg";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
@@ -14,7 +14,7 @@ export const generateWordPair = async () => {
 
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `Genera un objeto JSON válido con dos campos: 
         1. 'word': Una palabra sustantivo común en español tambien emociones para un juego de adivinanzas (ej. "Manzana", "Fútbol", "Astronauta").
@@ -40,6 +40,9 @@ export const generateWordPair = async () => {
 
     } catch (error) {
         console.error("Error Gemini:", error.message);
+        if (error.message.includes("400") || error.message.includes("API key")) {
+            console.warn("⚠️ Tu API Key no es válida o no tiene permisos. El juego usará palabras locales por ahora.");
+        }
         return getRandomFallback();
     }
 };
