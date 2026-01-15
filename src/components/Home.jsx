@@ -11,7 +11,7 @@ const Home = () => {
     const [isJoining, setIsJoining] = useState(false);
 
     const handleCreate = async () => {
-        if (!name) return setError('Please enter your name');
+        if (!name) return setError('Por favor ingresa tu nombre');
         console.log('Creating game with name:', name);
         const roomId = await createGame(name);
         console.log('Room ID returned:', roomId);
@@ -24,7 +24,7 @@ const Home = () => {
     };
 
     const handleJoin = async () => {
-        if (!name || !roomCode) return setError('Please enter name and room code');
+        if (!name || !roomCode) return setError('Ingresa nombre y código de sala');
         try {
             await joinGame(roomCode, name);
             navigate('/lobby');
@@ -46,13 +46,13 @@ const Home = () => {
 
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-400 mb-1">Nickname</label>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">Nombre</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="w-full bg-slate-700 border border-slate-600 rounded p-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
-                            placeholder="Enter your name"
+                            placeholder="Tu nombre"
                         />
                     </div>
 
@@ -62,19 +62,19 @@ const Home = () => {
                                 onClick={handleCreate}
                                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded font-bold transition flex items-center justify-center gap-2"
                             >
-                                <Play size={20} /> Create Game
+                                <Play size={20} /> Crear Partida
                             </button>
                             <button
                                 onClick={() => setIsJoining(true)}
                                 className="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 rounded font-bold transition flex items-center justify-center gap-2"
                             >
-                                <Users size={20} /> Join Game
+                                <Users size={20} /> Unirse a Partida
                             </button>
                         </div>
                     ) : (
                         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Room Code</label>
+                                <label className="block text-sm font-medium text-slate-400 mb-1">Código de Sala</label>
                                 <input
                                     type="text"
                                     value={roomCode}
@@ -89,13 +89,13 @@ const Home = () => {
                                     onClick={() => setIsJoining(false)}
                                     className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded font-bold transition"
                                 >
-                                    Back
+                                    Atrás
                                 </button>
                                 <button
                                     onClick={handleJoin}
                                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded font-bold transition flex items-center justify-center gap-2"
                                 >
-                                    <LogIn size={20} /> Join
+                                    <LogIn size={20} /> Entrar
                                 </button>
                             </div>
                         </div>
@@ -107,3 +107,4 @@ const Home = () => {
 };
 
 export default Home;
+

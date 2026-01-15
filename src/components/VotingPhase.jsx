@@ -24,7 +24,6 @@ const VotingPhase = () => {
                 // Tally votes
                 const voteCounts = {};
                 Object.values(gameState.votes).forEach(targetId => {
-                    if (targetId === 'skip') return;
                     voteCounts[targetId] = (voteCounts[targetId] || 0) + 1;
                 });
 
@@ -40,46 +39,36 @@ const VotingPhase = () => {
                     }
                 }
 
-                // Process Ejection
-                let updatedPlayers = [...gameState.players];
+                // Determine winner logic:
+                // If ejectedId IS impostor -> Crew wins
+                // If ejectedId NOT impostor -> Impostor wins (Spyfall style sudden death)
+                // Or if Tie -> Impostor wins? Or continue? Let's say Impostor wins on tie/miss for simplicity for now
+
                 let winner = null;
-
-                if (ejectedId) {
-                    updatedPlayers = updatedPlayers.map(p =>
-                        p.id === ejectedId ? { ...p, isAlive: false } : p
-                    );
-                }
-
-                // Check Win Conditions
-                const impostor = updatedPlayers.find(p => p.id === gameState.impostorId);
-                const aliveImpostors = impostor.isAlive ? 1 : 0;
-                const aliveCrew = updatedPlayers.filter(p => p.id !== gameState.impostorId && p.isAlive).length;
-
-                if (aliveImpostors === 0) {
-                    winner = 'Crewmates';
-                } else if (aliveImpostors >= aliveCrew) {
-                    winner = 'Impostor';
+                if (ejectedId === gameState.impostorId) {
+                    winner = 'AMIGOS';
+                } else {
+                    winner = 'IMPOSTOR'; // Wrong guess or tie -> Impostor wins
                 }
 
                 const roomRef = doc(db, 'rooms', gameState.roomId);
                 await updateDoc(roomRef, {
-                    players: updatedPlayers,
-                    votes: {},
-                    status: winner ? 'ENDED' : 'PLAYING',
-                    winner: winner || null
+                    status: 'REVEAL', // Change to REVEAL instead of ENDED directly
+                    winner: winner,
+                    // We don't kill players in this mode, game ends after vote
                 });
             };
 
             // Small delay to show results then proceed
             const timer = setTimeout(() => {
                 calculateResults();
-            }, 3000);
+            }, 2000);
             return () => clearTimeout(timer);
         }
     }, [gameState.votes, isHost, gameState.players, gameState.impostorId, gameState.roomId]);
 
     const handleVote = (targetId) => {
-        if (hasVoted || !me.isAlive) return;
+        if (hasVoted) return;
         castVote(targetId);
         setHasVoted(true);
     };
@@ -87,7 +76,7 @@ const VotingPhase = () => {
     return (
         <div className="min-h-screen bg-slate-900 p-8 text-white flex flex-col items-center">
             <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <Vote className="text-emerald-500" size={32} /> WHO IS THE IMPOSTOR?
+                <Vote className="text-emerald-500" size={32} /> ¿QUIÉN ES EL IMPOSTOR?
             </h1>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
@@ -96,14 +85,12 @@ const VotingPhase = () => {
                         key={player.id}
                         className={`relative bg-slate-800 border-2 ${gameState.votes[playerId] === player.id ? 'border-emerald-500' : 'border-slate-700'} rounded-xl p-4 flex flex-col items-center gap-2 transition hover:bg-slate-700`}
                     >
-                        {!player.isAlive && <div className="absolute inset-0 bg-red-900/50 flex items-center justify-center rounded-xl z-10 font-bold text-red-300">DEAD</div>}
-
                         <div className="w-16 h-16 bg-slate-600 rounded-full flex items-center justify-center text-2xl font-bold">
                             {player.name[0]}
                         </div>
                         <span className="font-bold text-lg">{player.name}</span>
 
-                        {/* Show votes received (publicly visible for fun/simplicity) */}
+                        {/* Show votes received */}
                         <div className="flex gap-1 mt-2">
                             {Object.entries(gameState.votes).map(([voterId, targetId]) => {
                                 if (targetId === player.id) {
@@ -118,22 +105,22 @@ const VotingPhase = () => {
                             })}
                         </div>
 
-                        {player.isAlive && me.isAlive && !hasVoted && (
+                        {player.id !== playerId && !hasVoted && (
                             <button
                                 onClick={() => handleVote(player.id)}
                                 className="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded text-sm font-bold uppercase"
                             >
-                                Vote
+                                VOTAR
                             </button>
                         )}
                     </div>
                 ))}
             </div>
 
-            {hasVoted && <p className="mt-8 text-slate-400 animate-pulse">Waiting for other players...</p>}
-            {!me.isAlive && <p className="mt-8 text-red-400">You are dead and cannot vote effectively (logic simplified).</p>}
+            {hasVoted && <p className="mt-8 text-slate-400 animate-pulse">Esperando votos...</p>}
         </div>
     );
 };
 
 export default VotingPhase;
+
