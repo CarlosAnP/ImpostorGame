@@ -1,10 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { fallbackPairs } from '../data/wordPairs';
 
-// --- CONFIGURACIÓN ---
-// Pega tu API KEY aquí abajo entre las comillas
-const API_KEY = "PAIzaSyCgLa-duAUaP0Jp1jU8c3o_cgd9BsHRur0";
-// ---------------------
+const API_KEY = "AIzaSyCgLa-duAUaP0Jp1jU8c3o_cgd9BsHRur0";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 
